@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Plant Disease Prediction</title>
+</head>
+<style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f0f4f8;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    margin: 0;
+  }
+
+  h2 {
+    color: #333;
+  }
+
+  #fileInput {
+    margin: 20px 0;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    cursor: pointer;
+  }
+
+  button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+  }
+
+  button:hover {
+    background-color: #45a049;
+  }
+
+  #result {
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    min-width: 300px;
+    text-align: center;
+    font-weight: bold;
+    color: #333;
+  }
+</style>
+
+<body>
+  <h2>Upload a Leaf Image</h2>
+  <input type="file" id="fileInput" />
+  <button onclick="uploadImage()">Predict</button>
+
+  <p id="result"></p>
+
+  <script>
+    async function uploadImage() {
+      const fileInput = document.getElementById('fileInput');
+      if (!fileInput.files.length) {
+        alert("Please select a file.");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('file', fileInput.files[0]);
+
+      try {
+        const response = await fetch('http://127.0.0.1:5000/predict', {
+          method: 'POST',
+          body: formData
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+          document.getElementById('result').innerText =
+            `Predicted Class: ${data.predicted_class}, Confidence: ${data.confidence}`;
+        } else {
+          document.getElementById('result').innerText =
+            `Error: ${data.error}`;
+        }
+      } catch (err) {
+        console.error(err);
+        document.getElementById('result').innerText = "Request failed.";
+      }
+    }
+  </script>
+</body>
+</html>
